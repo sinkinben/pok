@@ -22,8 +22,7 @@
 
 #define N 8
 
-extern uint8_t sid;
-extern uint8_t mutex;
+extern uint8_t sem_buf1;
 uint8_t val;
 
 extern buffer_t buf1, buf2;
@@ -35,7 +34,7 @@ void *producer_job()
    char item = 'a';
    for (i = 0; i < N; i++)
    {
-      ret = pok_sem_signal(sid);
+      ret = pok_sem_signal(sem_buf1);
       item = 'a' + i;
       buffer_put_item(&buf1, item);
       printf("[Producer] put item [%c] into buf1. \n", item);
@@ -51,7 +50,7 @@ void *consumer_job()
    char item;
    for (i = 0; i < N; i++)
    {
-      pok_sem_wait(sid, 0);
+      pok_sem_wait(sem_buf1, 0);
       item = buffer_get_item(&buf1);
       printf("\t[Consumer] get item [%c] from buf1. \n", item);
       pok_thread_sleep(40000);

@@ -21,8 +21,7 @@
 #include <types.h>
 #include "activity.h"
 
-uint8_t sid;
-uint8_t mutex;
+uint8_t sem_buf1;
 buffer_t buf1, buf2;
 
 int main()
@@ -34,8 +33,7 @@ int main()
   pok_ret_t ret;
   pok_thread_attr_t tattr;
 
-  ret = pok_sem_create(&sid, 0, 50, POK_SEMAPHORE_DISCIPLINE_FIFO);
-  ret = pok_sem_create(&mutex, 1, 2, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&sem_buf1, 0, 50, POK_SEMAPHORE_DISCIPLINE_FIFO);
   // printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.priority = 42;
