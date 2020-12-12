@@ -16,8 +16,6 @@
 
 #ifndef __POK_USER_GENERATED_ACTIVITY_H_
 #define __POK_USER_GENERATED_ACTIVITY_H_
-void *pinger_job();
-void *pinger_job2();
 void *producer_job();
 void *consumer_job();
 #define CAPACITY 4 // buffer 的容量
