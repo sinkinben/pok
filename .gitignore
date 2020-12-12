@@ -1,0 +1,11 @@
+*.a
+*.o
+*.lo
+*.img
+*.bin
+*.elf
+*.elf.map
+*.depend
+*.depend.mk
+config.mk
+qemu.pid
