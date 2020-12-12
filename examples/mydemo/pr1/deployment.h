@@ -28,4 +28,6 @@
 
 #define POK_NEEDS_LIBC_STDLIB 1
 
+#define POK_NEEDS_MUTEXES 1
+
 #endif

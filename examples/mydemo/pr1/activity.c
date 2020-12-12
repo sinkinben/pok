@@ -17,12 +17,13 @@
 #include <libc/stdio.h>
 #include <core/thread.h>
 #include <core/semaphore.h>
+#include <core/mutex.h>
 #include <types.h>
 #include "activity.h"
 
 #define N 8
 
-extern uint8_t sem_buf1;
+extern uint8_t empty1, full1, mutex1;
 uint8_t val;
 
 extern buffer_t buf1, buf2;
@@ -34,11 +35,14 @@ void *producer_job()
    char item = 'a';
    for (i = 0; i < N; i++)
    {
-      ret = pok_sem_signal(sem_buf1);
+      pok_sem_wait(empty1, 0);
+      // pok_mutex_lock(mutex1);
       item = 'a' + i;
       buffer_put_item(&buf1, item);
       printf("[Producer] put item [%c] into buf1. \n", item);
-      pok_thread_sleep(20000);
+      // pok_mutex_unlock(mutex1);
+      pok_sem_signal(full1);
+      // pok_thread_sleep(20000);
    }
    return NULL;
 }
@@ -48,12 +52,15 @@ void *consumer_job()
    pok_ret_t ret;
    int i;
    char item;
+   pok_thread_sleep(800000);
    for (i = 0; i < N; i++)
    {
-      pok_sem_wait(sem_buf1, 0);
+      pok_sem_wait(full1, 0);
+      // pok_mutex_lock(mutex1);
       item = buffer_get_item(&buf1);
       printf("\t[Consumer] get item [%c] from buf1. \n", item);
-      pok_thread_sleep(40000);
+      // pok_mutex_unlock(mutex1);
+      pok_sem_signal(empty1);
    }
    return NULL;
 }

@@ -18,10 +18,13 @@
 #include <core/thread.h>
 #include <core/partition.h>
 #include <core/semaphore.h>
+#include <core/mutex.h>
 #include <types.h>
 #include "activity.h"
 
-uint8_t sem_buf1;
+uint8_t empty1;
+uint8_t full1;
+uint8_t mutex1;
 buffer_t buf1, buf2;
 
 int main()
@@ -33,7 +36,9 @@ int main()
   pok_ret_t ret;
   pok_thread_attr_t tattr;
 
-  ret = pok_sem_create(&sem_buf1, 0, 50, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_mutex_create(&mutex1, NULL);
+  ret = pok_sem_create(&empty1, CAPACITY, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&full1, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
   // printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.priority = 42;
