@@ -9,3 +9,4 @@
 *.depend.mk
 config.mk
 qemu.pid
+sizes.c
