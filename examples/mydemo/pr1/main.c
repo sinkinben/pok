@@ -14,7 +14,6 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-
 #include <libc/stdio.h>
 #include <core/thread.h>
 #include <core/partition.h>
@@ -23,30 +22,36 @@
 #include "activity.h"
 
 uint8_t sid;
+uint8_t mutex;
+buffer_t buf1, buf2;
 
-int main ()
+int main()
 {
+  // init buf
+  buffer_init(&buf1), buffer_init(&buf2);
+
   uint8_t tid;
   pok_ret_t ret;
-  pok_thread_attr_t     tattr;
+  pok_thread_attr_t tattr;
 
-  ret = pok_sem_create(&sid , 0, 50, POK_SEMAPHORE_DISCIPLINE_FIFO);
-  printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
-
-  tattr.priority = 42;
-  tattr.entry = pinger_job;
-
-  ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (1) return=%d\n", ret);
+  ret = pok_sem_create(&sid, 0, 50, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&mutex, 1, 2, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  // printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.priority = 42;
-  tattr.entry = pinger_job2;
+  tattr.entry = producer_job;
 
-  ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (2) return=%d\n", ret);
+  ret = pok_thread_create(&tid, &tattr);
+  // printf("[P1] pok_thread_create (1) return=%d\n", ret);
 
-  pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
-  pok_thread_wait_infinite ();
+  tattr.priority = 42;
+  tattr.entry = consumer_job;
 
-   return (0);
+  ret = pok_thread_create(&tid, &tattr);
+  // printf("[P1] pok_thread_create (2) return=%d\n", ret);
+
+  pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
+  pok_thread_wait_infinite();
+
+  return (0);
 }
