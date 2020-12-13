@@ -26,7 +26,7 @@
 #define POK_NEEDS_CONSOLE      1
 #define POK_NEEDS_LOCKOBJECTS  1
 
-#define POK_CONFIG_NB_THREADS       5
+#define POK_CONFIG_NB_THREADS       7
 #define POK_CONFIG_NB_LOCKOBJECTS       1
 #define POK_CONFIG_NB_PARTITIONS    2
 
