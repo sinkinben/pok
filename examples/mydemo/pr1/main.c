@@ -22,9 +22,7 @@
 #include <types.h>
 #include "activity.h"
 
-uint8_t empty1;
-uint8_t full1;
-uint8_t mutex1;
+uint8_t empty1, full1, mutex1;
 uint8_t empty2, full2, mutex2;
 buffer_t buf1, buf2;
 

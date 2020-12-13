@@ -18,30 +18,31 @@
 #include <core/thread.h>
 #include <core/semaphore.h>
 #include <core/mutex.h>
+#include <core/time.h>
 #include <types.h>
 #include "activity.h"
 
-#define N 8
+#define N 26
 
 extern uint8_t empty1, full1, mutex1;
 extern uint8_t empty2, full2, mutex2;
-uint8_t val;
-
 extern buffer_t buf1, buf2;
+
+static pok_time_t start, end;
 
 void *producer_job()
 {
-   pok_ret_t ret = 0;
+   pok_time_get(&start);
    int i;
    char item = 'a';
    for (i = 0; i < N; i++)
    {
       pok_sem_wait(empty1, 0);
-      ret = pok_sem_wait(mutex1, 0);
+      pok_sem_wait(mutex1, 0);
       item = 'a' + i;
       buffer_put_item(&buf1, item);
       printf("[Producer] put item [%c] into buf1. \n", item);
-      ret = pok_sem_signal(mutex1);
+      pok_sem_signal(mutex1);
       pok_sem_signal(full1);
    }
    return NULL;
@@ -67,11 +68,11 @@ void *calculator_job()
       pok_sem_signal(mutex2);
       pok_sem_signal(full2);
    }
+   return NULL;
 }
 
 void *consumer_job()
 {
-   pok_ret_t ret;
    int i;
    char item;
    for (i = 0; i < N; i++)
@@ -83,6 +84,8 @@ void *consumer_job()
       pok_sem_signal(mutex2);
       pok_sem_signal(empty2);
    }
+   pok_time_get(&end);
+   printf("[PR1] time = %d \n", end - start);
    return NULL;
 }
 
