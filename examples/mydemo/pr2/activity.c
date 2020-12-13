@@ -17,10 +17,14 @@
 
 #include <libc/stdio.h>
 #include <core/thread.h>
+#include <core/time.h>
 void* pinger_job ()
 {
+   pok_time_t t;
    while (1)
    {
+      pok_time_get(&t);
+      printf("t = %d\n", t);
       printf("P2T1: begin of task\n");
       pok_thread_sleep (12345);
    }

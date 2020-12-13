@@ -20,6 +20,9 @@
 
 #define POK_NEEDS_TIMER    1
 #define POK_NEEDS_THREADS  1
+#define POK_NEEDS_TIME     1
+#define POK_NEEDS_GETTICK  1
+#define POK_NEEDS_FUNCTION_TIME_GET 1
 
 #define POK_CONFIG_NB_THREADS 1
 

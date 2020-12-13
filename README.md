@@ -12,3 +12,14 @@ More information on https://pok-kernel.github.io/
 For commercial support: http://www.reblochon.io.
 
 Contact: pok at gunnm dot org
+
+
+## 个人笔记
+
+### 获取时间
+如果想要在用户程序（即 `examples` 下面的代码）中使用 `pok_time_get` 获取时间，那么要在 `deployment.h` 中定义：
+```c
+#define POK_NEEDS_GETTICK 1
+```
+
+恕我直（tu）言（cao），这个代码的宏定义设计太反人类的。
