@@ -18,6 +18,7 @@
 #define __POK_USER_GENERATED_ACTIVITY_H_
 void *producer_job();
 void *consumer_job();
+void *calculator_job();
 #define CAPACITY 4 // buffer 的容量
 typedef struct
 {

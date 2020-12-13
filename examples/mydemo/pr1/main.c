@@ -25,6 +25,7 @@
 uint8_t empty1;
 uint8_t full1;
 uint8_t mutex1;
+uint8_t empty2, full2, mutex2;
 buffer_t buf1, buf2;
 
 int main()
@@ -38,19 +39,24 @@ int main()
 
   tattr.priority = 42;
   tattr.entry = producer_job;
-
   ret = pok_thread_create(&tid, &tattr);
-  // printf("[P1] pok_thread_create (1) return=%d\n", ret);
+
+  tattr.priority = 42;
+  tattr.entry = calculator_job(&tid, &tattr);
+  ret = pok_thread_create(&tid, &tattr);
 
   tattr.priority = 42;
   tattr.entry = consumer_job;
-
   ret = pok_thread_create(&tid, &tattr);
-  // printf("[P1] pok_thread_create (2) return=%d\n", ret);
+
 
   ret = pok_sem_create(&mutex1, 1, 1, POK_SEMAPHORE_DISCIPLINE_FIFO);
   ret = pok_sem_create(&empty1, CAPACITY, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
   ret = pok_sem_create(&full1, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
+
+  ret = pok_sem_create(&mutex2, 1, 1, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&empty2, CAPACITY, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&full2, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
   // printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);

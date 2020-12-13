@@ -24,6 +24,7 @@
 #define N 8
 
 extern uint8_t empty1, full1, mutex1;
+extern uint8_t empty2, full2, mutex2;
 uint8_t val;
 
 extern buffer_t buf1, buf2;
@@ -46,6 +47,28 @@ void *producer_job()
    return NULL;
 }
 
+void *calculator_job()
+{
+   int i;
+   char item;
+   for (i = 0; i < N;i++)
+   {
+      pok_sem_wait(full1, 0);
+      pok_sem_wait(mutex1, 0);
+      item = buffer_get_item(&buf1);
+      pok_sem_signal(mutex1);
+      pok_sem_signal(empty1);
+
+      item = item - 'a' + 'A';
+
+      pok_sem_wait(empty2, 0);
+      pok_sem_wait(mutex2, 0);
+      buffer_put_item(&buf2, item);
+      pok_sem_signal(mutex2);
+      pok_sem_signal(full2);
+   }
+}
+
 void *consumer_job()
 {
    pok_ret_t ret;
@@ -53,12 +76,12 @@ void *consumer_job()
    char item;
    for (i = 0; i < N; i++)
    {
-      pok_sem_wait(full1, 0);
-      pok_sem_wait(mutex1, 0);
-      item = buffer_get_item(&buf1);
-      printf("\t[Consumer] get item [%c] from buf1. \n", item);
-      pok_sem_signal(mutex1);
-      pok_sem_signal(empty1);
+      pok_sem_wait(full2, 0);
+      pok_sem_wait(mutex2, 0);
+      item = buffer_get_item(&buf2);
+      printf("\t[Consumer] get item [%c] from buf2. \n", item);
+      pok_sem_signal(mutex2);
+      pok_sem_signal(empty2);
    }
    return NULL;
 }
