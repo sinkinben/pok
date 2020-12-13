@@ -14,9 +14,13 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-
 #ifndef __POK_USER_GENERATED_ACTIVITY_H_
-#define __POK_USER_GENERATED_ACTIVITY_H_ 
-void* pinger_job ();
+#define __POK_USER_GENERATED_ACTIVITY_H_
+#define CAPACITY 3
+void *pinger_job();
+void *father_job();
+void *mother_job();
+void *son_job();
+void *daughter_job();
 
 #endif

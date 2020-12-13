@@ -20,10 +20,12 @@
 #include <core/time.h>
 void* pinger_job ()
 {
+   pok_time_t time;
    while (1)
    {
-      printf("P3T1: begin of task\n");
-      pok_thread_sleep (12345);
+      pok_time_get(&time);
+      printf("P3T1: time = %u \n", time);
+      pok_thread_sleep (123456);
    }
 }
 

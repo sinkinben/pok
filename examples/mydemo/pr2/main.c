@@ -17,21 +17,34 @@
 #include <libc/stdio.h>
 #include <core/thread.h>
 #include <core/partition.h>
+#include <core/semaphore.h>
 #include <types.h>
 #include "activity.h"
 
-
-int main ()
+pok_sem_id_t apple, orange, empty;
+int main()
 {
   uint32_t tid;
   int ret;
   pok_thread_attr_t     tattr;
 
   tattr.priority = 42;
-  tattr.entry = pinger_job;
 
+  tattr.entry = father_job;
   ret = pok_thread_create(&tid , &tattr);
-  printf ("[P2] thread create returns=%d\n", ret);
+
+  tattr.entry = mother_job;
+  ret = pok_thread_create(&tid, &tattr);
+
+  tattr.entry = son_job;
+  ret = pok_thread_create(&tid, &tattr);
+
+  tattr.entry = daughter_job;
+  ret = pok_thread_create(&tid, &tattr);
+
+  ret = pok_sem_create(&apple, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&orange, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&empty, CAPACITY, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
 
   pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite ();
