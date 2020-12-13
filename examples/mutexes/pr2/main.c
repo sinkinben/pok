@@ -14,7 +14,7 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-
+#include <core/partition.h>
 #include <core/thread.h>
 #include <types.h>
 #include "activity.h"
@@ -32,6 +32,7 @@ int main ()
   ret = pok_thread_create(&tid , &tattr);
   printf ("thread create returns=%d\n", ret);
 
+  pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite ();
 
   return (1);
