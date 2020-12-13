@@ -36,13 +36,12 @@ void *producer_job()
    for (i = 0; i < N; i++)
    {
       pok_sem_wait(empty1, 0);
-      // pok_mutex_lock(mutex1);
+      ret = pok_sem_wait(mutex1, 0);
       item = 'a' + i;
       buffer_put_item(&buf1, item);
       printf("[Producer] put item [%c] into buf1. \n", item);
-      // pok_mutex_unlock(mutex1);
+      ret = pok_sem_signal(mutex1);
       pok_sem_signal(full1);
-      // pok_thread_sleep(20000);
    }
    return NULL;
 }
@@ -52,14 +51,13 @@ void *consumer_job()
    pok_ret_t ret;
    int i;
    char item;
-   pok_thread_sleep(800000);
    for (i = 0; i < N; i++)
    {
       pok_sem_wait(full1, 0);
-      // pok_mutex_lock(mutex1);
+      pok_sem_wait(mutex1, 0);
       item = buffer_get_item(&buf1);
       printf("\t[Consumer] get item [%c] from buf1. \n", item);
-      // pok_mutex_unlock(mutex1);
+      pok_sem_signal(mutex1);
       pok_sem_signal(empty1);
    }
    return NULL;

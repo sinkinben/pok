@@ -36,11 +36,6 @@ int main()
   pok_ret_t ret;
   pok_thread_attr_t tattr;
 
-  ret = pok_mutex_create(&mutex1, NULL);
-  ret = pok_sem_create(&empty1, CAPACITY, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
-  ret = pok_sem_create(&full1, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
-  // printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
-
   tattr.priority = 42;
   tattr.entry = producer_job;
 
@@ -52,6 +47,11 @@ int main()
 
   ret = pok_thread_create(&tid, &tattr);
   // printf("[P1] pok_thread_create (2) return=%d\n", ret);
+
+  ret = pok_sem_create(&mutex1, 1, 1, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&empty1, CAPACITY, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&full1, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  // printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite();
