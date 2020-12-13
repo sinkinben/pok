@@ -15,18 +15,19 @@
  */
 
 
-#include <libc/stdio.h>
-#include <core/thread.h>
-#include <core/time.h>
-void* pinger_job ()
-{
-   pok_time_t t;
-   while (1)
-   {
-      pok_time_get(&t);
-      printf("t = %u\n", t);
-      printf("P2T1: begin of task\n");
-      pok_thread_sleep (12345);
-   }
-}
+#ifndef __POK_USER_GENERATED_DEPLOYMENT_H_
+#define __POK_USER_GENERATED_DEPLOYMENT_H_ 
 
+#define POK_NEEDS_TIMER    1
+#define POK_NEEDS_THREADS  1
+#define POK_NEEDS_TIME     1
+#define POK_NEEDS_GETTICK  1
+#define POK_NEEDS_FUNCTION_TIME_GET 1
+
+#define POK_CONFIG_NB_THREADS 1
+
+#define POK_NEEDS_LIBC_STDLIB 1
+#define POK_NEEDS_SEMAPHORES 1
+#define POK_NEEDS_MUTEXES 1
+
+#endif

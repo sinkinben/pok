@@ -32,34 +32,41 @@
 #define POK_NEEDS_GETTICK      1
 #define POK_NEEDS_FUNCTION_TIME_GET 1
 
-#define POK_CONFIG_NB_THREADS       8
+#define POK_CONFIG_NB_THREADS       10
 #define POK_CONFIG_NB_LOCKOBJECTS   6
-#define POK_CONFIG_NB_PARTITIONS    2
+#define POK_CONFIG_NB_PARTITIONS    3
 
-#define POK_CONFIG_PARTITIONS_SIZE  {120 * 1024, 120 * 1024};
-#define POK_CONFIG_PROGRAM_NAME  {"pr1/pr1.elf","pr2/pr2.elf"};
+#define POK_CONFIG_PARTITIONS_SIZE  {120 * 1024, 120 * 1024, 120 * 1024};
+#define POK_CONFIG_PROGRAM_NAME  {"pr1/pr1.elf","pr2/pr2.elf","pr3/pr3.elf"};
 
-#define POK_CONFIG_SCHEDULING_SLOTS {2000000000, 40000000000, 1000000000, 10000000000}
-#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 53000000000
-#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0,1,0,1}
+/**
+ * SLOTS 是给每个分区设定一个时间片
+ * FRAME 是 SLOTS 之和
+ * ALLOCATION 是分区调度序列
+ **/
+#define POK_CONFIG_SCHEDULING_SLOTS {1000000000, 1000000000, 1000000000, 1000000000}
+#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 4000000000
+#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0,1,2,0}
 #define POK_CONFIG_SCHEDULING_NBSLOTS 4
 
 #define POK_NEEDS_THREAD_SUSPEND 1
 #define POK_NEEDS_THREAD_SLEEP 1
 
-#define POK_CONFIG_PARTITIONS_NTHREADS  {4,2}
-#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS  {6,0}
+#define POK_CONFIG_PARTITIONS_NTHREADS  {4,2,2}
+#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS  {6,0,0}
 
 typedef enum
 {
    pok_part_identifier_pr1 = 0,
-   pok_part_identifier_pr2 = 1
+   pok_part_identifier_pr2 = 1,
+   pok_part_identifier_pr3 = 2,
 }pok_part_identifiers_t;
 
 typedef enum
 {
    pok_part_id_pr1 = 0,
-   pok_part_id_pr2 = 1
+   pok_part_id_pr2 = 1,
+   pok_node_id_pr3 = 2
 }pok_part_id_t;
 
 typedef enum

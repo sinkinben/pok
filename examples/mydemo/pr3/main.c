@@ -14,19 +14,29 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-
 #include <libc/stdio.h>
 #include <core/thread.h>
-#include <core/time.h>
-void* pinger_job ()
+#include <core/partition.h>
+#include <types.h>
+#include "activity.h"
+
+
+int main ()
 {
-   pok_time_t t;
-   while (1)
-   {
-      pok_time_get(&t);
-      printf("t = %u\n", t);
-      printf("P2T1: begin of task\n");
-      pok_thread_sleep (12345);
-   }
+  uint32_t tid;
+  int ret;
+  pok_thread_attr_t     tattr;
+
+  tattr.priority = 42;
+  tattr.entry = pinger_job;
+
+  ret = pok_thread_create(&tid , &tattr);
+  printf ("[P3] thread create returns=%d\n", ret);
+
+  pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
+  pok_thread_wait_infinite ();
+
+  return (1);
 }
+
 
