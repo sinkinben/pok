@@ -14,7 +14,7 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-
+#include <libc/stdio.h>
 #include <core/thread.h>
 #include <core/partition.h>
 #include <types.h>
@@ -23,7 +23,7 @@
 
 int main ()
 {
-  uint8_t tid;
+  uint32_t tid;
   int ret;
   pok_thread_attr_t     tattr;
 

@@ -31,7 +31,7 @@ int main()
   // init buf
   buffer_init(&buf1), buffer_init(&buf2);
 
-  uint8_t tid;
+  uint32_t tid;
   pok_ret_t ret;
   pok_thread_attr_t tattr;
 
