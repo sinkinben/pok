@@ -22,7 +22,8 @@
 #include <types.h>
 #include "activity.h"
 
-#define N 26
+static const int N = 260;
+static const int limit = 26;
 
 extern uint8_t empty1, full1, mutex1;
 extern uint8_t empty2, full2, mutex2;
@@ -39,7 +40,7 @@ void *producer_job()
    {
       pok_sem_wait(empty1, 0);
       pok_sem_wait(mutex1, 0);
-      item = 'a' + i;
+      item = 'a' + (i % limit);
       buffer_put_item(&buf1, item);
       printf("[Producer] put item [%c] into buf1. \n", item);
       pok_sem_signal(mutex1);
