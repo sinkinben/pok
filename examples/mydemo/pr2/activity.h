@@ -17,10 +17,25 @@
 #ifndef __POK_USER_GENERATED_ACTIVITY_H_
 #define __POK_USER_GENERATED_ACTIVITY_H_
 #define CAPACITY 3
+typedef struct
+{
+    uint8_t fruits[CAPACITY];
+    uint32_t in, out;
+} plate_t;
+typedef enum
+{
+    APPLE = 0,
+    ORANGE
+} fruit_t;
+
 void *pinger_job();
 void *father_job();
 void *mother_job();
 void *son_job();
 void *daughter_job();
+
+void plate_init(plate_t *p);
+void plate_put_fruit(plate_t *p, fruit_t f);
+uint8_t plate_get_fruit(plate_t *p);
 
 #endif

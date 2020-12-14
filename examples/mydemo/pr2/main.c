@@ -21,17 +21,22 @@
 #include <types.h>
 #include "activity.h"
 
-pok_sem_id_t apple, orange, empty;
+pok_sem_id_t apple, orange, empty, mutex;
+plate_t plate;
+
 int main()
 {
+  // init plate buffer
+  plate_init(&plate);
+
   uint32_t tid;
   int ret;
-  pok_thread_attr_t     tattr;
+  pok_thread_attr_t tattr;
 
   tattr.priority = 42;
 
   tattr.entry = father_job;
-  ret = pok_thread_create(&tid , &tattr);
+  ret = pok_thread_create(&tid, &tattr);
 
   tattr.entry = mother_job;
   ret = pok_thread_create(&tid, &tattr);
@@ -42,14 +47,13 @@ int main()
   tattr.entry = daughter_job;
   ret = pok_thread_create(&tid, &tattr);
 
-  ret = pok_sem_create(&apple, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
-  ret = pok_sem_create(&orange, 0, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
-  ret = pok_sem_create(&empty, CAPACITY, CAPACITY, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&mutex, 1, 1, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&apple, 0, CAPACITY - 1, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&orange, 0, CAPACITY - 1, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&empty, CAPACITY - 1, CAPACITY - 1, POK_SEMAPHORE_DISCIPLINE_FIFO);
 
-  pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
-  pok_thread_wait_infinite ();
+  pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
+  pok_thread_wait_infinite();
 
   return (1);
 }
-
-
