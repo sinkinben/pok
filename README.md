@@ -23,3 +23,22 @@ Contact: pok at gunnm dot org
 ```
 
 恕我直（tu）言（cao），这个代码的宏定义设计太反人类的。
+
+### 新增内核调度
+原本的 pok-kernel 似乎本来就是支持抢占的，因为在 `boot.c` 中存在这么一句：
+```c
+pok_arch_preempt_enable();
+```
+它会调用对应 ARCH 文件夹下的 `arch.c` 的同名函数实现。
+
+几个重要文件：
++ partition.c: `pok_partition_setup_scheduler`, 60 行左右的位置
++ sched.{c,h}: 添加调度算法
++ schedvalues.h: 添加 `switch-case` 的枚举类型
+
+原本的 kernel 只实现了 RMS 调度算法 (参考 `partition.c`)，要做的就是支持更多的线程调度：
++ POK_SCHED_EDF 
++ POK_SCHED_RR
++ POK_SCHED_WRR
++ POK_SCHED_PRIORITY
++ POK_SCHED_MLFQ (选做)
