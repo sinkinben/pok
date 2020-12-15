@@ -57,25 +57,27 @@
 
 typedef struct
 {
-	 uint8_t      priority;
-	 uint64_t     period;
-	 uint64_t     deadline;
-	 uint64_t     time_capacity;
-	 uint64_t     remaining_time_capacity;
-	 uint64_t     next_activation;
-	 pok_state_t  state;
-	 uint64_t	end_time;
-	 uint64_t     wakeup_time;
+	uint8_t priority;
+	uint64_t period;
+	uint64_t deadline;
+	uint64_t time_capacity;
+	uint64_t remaining_time_capacity;
+	uint64_t next_activation;
+	pok_state_t state;
+	uint64_t end_time;
+	uint64_t wakeup_time;
 #ifdef POK_NEEDS_SCHED_HFPPS
-	 uint64_t	payback; /**< Payback for HFPPS scheduling algorithm */
-#endif /* POK_NEEDS_SCHED_HFPPS */
-	 void			 *entry;
-	 uint8_t		 partition;
-	 uint32_t		 sp;
-	 uint32_t    init_stack_addr;
-  uint8_t	base_priority;
-	 /* stack pointer
+	uint64_t payback; /**< Payback for HFPPS scheduling algorithm */
+#endif				  /* POK_NEEDS_SCHED_HFPPS */
+	void *entry;
+	uint8_t partition;
+	uint32_t sp;
+	uint32_t init_stack_addr;
+	uint8_t base_priority;
+	/* stack pointer
 		* FIXME: this is platform-dependent code, we have to handle that ! */
+	int weight; 	// add by sinkinben at 2020/12/15
+	uint64_t arrive_time;
 } pok_thread_t;
 
 typedef struct
@@ -87,6 +89,9 @@ typedef struct
 	 uint64_t     time_capacity;
 	 uint32_t     stack_size;
 	 pok_state_t  state;
+	 /* add by sinkinben at 2020/12/15 */
+	 int weight;
+	 uint64_t arrive_time;
 } pok_thread_attr_t;
 /*
  * Attributes given to create a thread
