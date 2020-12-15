@@ -14,7 +14,7 @@ For commercial support: http://www.reblochon.io.
 Contact: pok at gunnm dot org
 
 
-## 个人笔记
+## 笔记
 
 ### 获取时间
 如果想要在用户程序（即 `examples` 下面的代码）中使用 `pok_time_get` 获取时间，那么要在 `deployment.h` 中定义：
@@ -52,4 +52,34 @@ pok_arch_preempt_enable();
 为了支持分区使用不同的线程调度算法，需要在 `kernel/deployment.h` 中定义：
 ```c
 #define POK_CONFIG_PARTITIONS_SCHEDULER {POK_SCHED_WRR, POK_SCHED_RR, ...}
+```
+
+### 内核线程调度的函数调用
+```c
+// 执行当前分区的调度, 是调度开始的地方
+pok_sched()
+  |
+  V
+// 在选中的 partition 中选择一个线程执行（分区调度在线程调度前完成）
+pok_elect_thread(elected_partition)
+  |
+  V
+// 这里就会调用自定义的 pok_sched_part_xxx 调度算法，参考 partition.c 中的 pok_partition_setup_scheduler() 函数
+new_partition->sched_func(...)
+```
+
+### 内核分区调度
+在 sched.c 中的 `pok_elect_partition()` 的函数实现。
+分区调度其实是通过用户程序中的 `kernel/deployment.h` 中配置如下的宏定义实现的：
+```c
+/**
+ * SLOTS 是给每个分区设定一个时间片
+ * FRAME 是 SLOTS 之和
+ * ALLOCATION 是分区调度序列（通过分区的 ID 来表示）
+ * NBSLOTS 表示分区个数
+ **/
+#define POK_CONFIG_SCHEDULING_SLOTS {1000000000, 1000000000, 1000000000, 1000000000}
+#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 4000000000
+#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {1,1,1,1}
+#define POK_CONFIG_SCHEDULING_NBSLOTS 4
 ```
