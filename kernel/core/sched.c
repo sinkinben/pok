@@ -468,7 +468,9 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
 {
    uint32_t res;
    uint32_t from;
-
+   // IDLE_THREAD 被宏定义为 (POK_CONFIG_NB_THREADS-1)
+   // IDLE_THREAD 应该是表示分区中的一个无意义的, 起占位作用的线程
+   // 分区中的线程数总是等于 main 函数创建的线程数 + 1 (参考 example 程序中的 kernel/deployment.h)
    if (current_thread == IDLE_THREAD)
    {
       res = prev_thread;
@@ -479,12 +481,12 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
    }
 
    from = res;
-
+   // 如果当前线程时间片剩余，并且正在执行，返回当前线程，继续执行
    if ((pok_threads[current_thread].remaining_time_capacity > 0) && (pok_threads[current_thread].state == POK_STATE_RUNNABLE))
    {
       return current_thread;
    }
-
+   // res 从 current_thread 开始, 在 [index_low, index_high] 中查找
    do
    {
       res++;
@@ -495,6 +497,7 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
    }
    while ((res != from) && (pok_threads[res].state != POK_STATE_RUNNABLE));
 
+   // 最终选择的线程 res 跟原来的线程 from 相同, 切换到 IDLE_THREAD
    if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
    {
       res = IDLE_THREAD;
