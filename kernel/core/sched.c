@@ -513,24 +513,32 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
 uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
    // TODO
+   printf("hello, edf\n");
+   return IDLE_THREAD;
    return index_low + index_high + prev_thread + current_thread;
 }
 
 uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
    // TODO
+   printf("hello, wrr\n");
+   return IDLE_THREAD;
    return index_low + index_high + prev_thread + current_thread;
 }
 
 uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
    // TODO
+   printf("hello, priority\n");
+   return IDLE_THREAD;
    return index_low + index_high + prev_thread + current_thread;
 }
 
 uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
    // TODO
+   printf("hello, mlfq\n");
+   return IDLE_THREAD;
    return index_low + index_high + prev_thread + current_thread;
 }
 
