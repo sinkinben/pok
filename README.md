@@ -16,7 +16,7 @@ Contact: pok at gunnm dot org
 
 ## 笔记
 
-### 获取时间
+### 1 获取时间
 如果想要在用户程序（即 `examples` 下面的代码）中使用 `pok_time_get` 获取时间，那么要在 `deployment.h` 中定义：
 ```c
 #define POK_NEEDS_GETTICK 1
@@ -24,7 +24,7 @@ Contact: pok at gunnm dot org
 
 恕我直（tu）言（cao），这个代码的宏定义设计太反人类的。
 
-### 新增内核调度
+### 2 新增内核调度
 原本的 pok-kernel 似乎本来就是支持抢占的，因为在 `boot.c` 中存在这么一句：
 ```c
 pok_arch_preempt_enable();
@@ -54,7 +54,7 @@ pok_arch_preempt_enable();
 #define POK_CONFIG_PARTITIONS_SCHEDULER {POK_SCHED_WRR, POK_SCHED_RR, ...}
 ```
 
-### 内核线程调度的函数调用
+### 3 内核线程调度的函数调用
 ```c
 // 执行当前分区的调度, 是调度开始的地方
 pok_sched()
@@ -68,7 +68,7 @@ pok_elect_thread(elected_partition)
 new_partition->sched_func(...)
 ```
 
-### 内核分区调度
+### 4 内核分区调度
 在 sched.c 中的 `pok_elect_partition()` 的函数实现。
 分区调度其实是通过用户程序中的 `kernel/deployment.h` 中配置如下的宏定义实现的：
 ```c
