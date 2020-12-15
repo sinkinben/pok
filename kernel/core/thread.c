@@ -124,7 +124,7 @@ void pok_thread_init(void)
    for (i = 0; i < POK_CONFIG_NB_THREADS; ++i)
    {
       pok_threads[i].arrive_time                = 0;  // added by sinkinben at 2020/12/15
-      pok_threads[i].base_priority              = 0;  // unsure, maybe should be init with 0
+      pok_threads[i].base_priority              = pok_sched_get_priority_min(0);  // unsure, just assignment like above
       pok_threads[i].weight                     = 0;  // every thread weight should 0 at starting phase
 
       pok_threads[i].period                     = 0;
