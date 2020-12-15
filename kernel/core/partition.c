@@ -257,6 +257,9 @@ pok_ret_t pok_partition_init ()
 
       pok_partition_setup_main_thread (i);
       pok_partitions[i].current_thread    = pok_partitions[i].thread_main;
+
+      // added by sinkinben at 2020/12/15, every partition's weight should 0 at inti phase
+      pok_partitions[i].current_weight = 0;
    }
 
    return POK_ERRNO_OK;
