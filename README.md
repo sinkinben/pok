@@ -41,3 +41,10 @@ pok_arch_preempt_enable();
 + POK_SCHED_WRR
 + POK_SCHED_PRIORITY
 + POK_SCHED_MLFQ (选做)
+
+目前改动的代码：
++ 在 `pok_thread_t` 中新增了 2 成员：`weight` 和 `arrive_time`, 以支持 WRR 算法的实现
+  - 在 `thread.c` 中均初始化为 0 
+  - 在 `examples` 中的用户程序中，目前可以通过 `pok_thread_attr_t` 中的 `weight, arrive_time` 改变线程的权重
++ 在 `pok_partition_t` 中新增成员：`current_weight`:
+  - 在 `partition.c` 中初始化为 0 
