@@ -36,9 +36,8 @@ pok_arch_preempt_enable();
 + sched.{c,h}: 添加调度算法
 + schedvalues.h: 添加 `switch-case` 的枚举类型
 
-原本的 kernel 只实现了 RMS 调度算法 (参考 `partition.c`)，要做的就是支持更多的线程调度：
+原本的 kernel 只实现了 RMS 和 RR 调度算法 (参考 `partition.c`, 默认是 RR 调度)，要做的就是支持更多的线程调度：
 + POK_SCHED_EDF 
-+ POK_SCHED_RR
 + POK_SCHED_WRR
 + POK_SCHED_PRIORITY
 + POK_SCHED_MLFQ (选做)
