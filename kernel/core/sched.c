@@ -507,28 +507,28 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
  * \date: 2020/12/15
  * \brief: add more scheduler algorithm here
  **/
-uint32_t pok_sched_part_edf(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread)
+uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
    // TODO
-   return -1;
+   return index_low + index_high + prev_thread + current_thread;
 }
 
-uint32_t pok_sched_part_wrr(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread)
+uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
    // TODO
-   return -1;
+   return index_low + index_high + prev_thread + current_thread;
 }
 
-uint32_t pok_sched_part_priority(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread)
+uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
    // TODO
-   return -1;
+   return index_low + index_high + prev_thread + current_thread;
 }
 
-uint32_t pok_sched_part_mlfq(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread)
+uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
    // TODO
-   return -1;
+   return index_low + index_high + prev_thread + current_thread;
 }
 
 #if defined (POK_NEEDS_LOCKOBJECTS) || defined (POK_NEEDS_PORTS_QUEUEING) || defined (POK_NEEDS_PORTS_SAMPLING)
