@@ -42,12 +42,20 @@ pok_arch_preempt_enable();
 + POK_SCHED_PRIORITY
 + POK_SCHED_MLFQ (选做)
 
-目前改动的代码：
+目前改动的数据结构：
+在 kernel 中：
 + 在 `pok_thread_t` 中新增了 2 成员：`weight` 和 `arrive_time`, 以支持 WRR 算法的实现
   - 在 `thread.c` 中均初始化为 0 
   - 在 `examples` 中的用户程序中，目前可以通过 `pok_thread_attr_t` 中的 `weight, arrive_time` 改变线程的权重
++ 在 `pok_thread_attr_t` 中新增了 2 成员：`weight` 和 `arrive_time`
+  - 允许在用户程序中通过 `attr` 来修改线程的 `weight` 和 `arrive_time`, 因为内核数据结构用户程序是不可见的
 + 在 `pok_partition_t` 中新增成员：`current_weight`:
   - 在 `partition.c` 中初始化为 0 
+
+在 libpok 中：
++ 在 `pok_thread_attr_t` 中新增了 2 成员：`weight` 和 `arrive_time`
+  - 原因同上，用户程序中调用的就是这里的 `attr`
+  - 最后通过 `libpok` 提供的 API 完成与内核的交互
 
 为了支持分区使用不同的线程调度算法，需要在 `kernel/deployment.h` 中定义：
 ```c
