@@ -26,7 +26,11 @@ typedef enum
    POK_SCHED_RMS              = 3,
    POK_SCHED_EDF              = 4,
    POK_SCHED_LLF              = 5,
-   POK_SCHED_STATIC           = 6
+   POK_SCHED_STATIC           = 6,
+   // add by sinkinben at 2020/12/15
+   POK_SCHED_PRIORITY,
+   POK_SCHED_WRR,
+   POK_SCHED_MLFQ,
 } pok_sched_t;
 
 #endif
