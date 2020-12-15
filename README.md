@@ -48,3 +48,8 @@ pok_arch_preempt_enable();
   - 在 `examples` 中的用户程序中，目前可以通过 `pok_thread_attr_t` 中的 `weight, arrive_time` 改变线程的权重
 + 在 `pok_partition_t` 中新增成员：`current_weight`:
   - 在 `partition.c` 中初始化为 0 
+
+为了支持分区使用不同的线程调度算法，需要在 `kernel/deployment.h` 中定义：
+```c
+#define POK_CONFIG_PARTITIONS_SCHEDULER {POK_SCHED_WRR, POK_SCHED_RR, ...}
+```
