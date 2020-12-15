@@ -502,6 +502,34 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
    return res;
 }
 
+/**
+ * \author: sinkinben
+ * \date: 2020/12/15
+ * \brief: add more scheduler algorithm here
+ **/
+uint32_t pok_sched_part_edf(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread)
+{
+   // TODO
+   return -1;
+}
+
+uint32_t pok_sched_part_wrr(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread)
+{
+   // TODO
+   return -1;
+}
+
+uint32_t pok_sched_part_priority(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread)
+{
+   // TODO
+   return -1;
+}
+
+uint32_t pok_sched_part_mlfq(const uint32_t, const uint32_t, const uint32_t prev_thread, const uint32_t current_thread)
+{
+   // TODO
+   return -1;
+}
 
 #if defined (POK_NEEDS_LOCKOBJECTS) || defined (POK_NEEDS_PORTS_QUEUEING) || defined (POK_NEEDS_PORTS_SAMPLING)
 void pok_sched_unlock_thread (const uint32_t thread_id)
