@@ -14,10 +14,10 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-
 #ifndef __POK_USER_GENERATED_ACTIVITY_H_
-#define __POK_USER_GENERATED_ACTIVITY_H_ 
-void* pinger_job ();
-void* pinger_job2 ();
+#define __POK_USER_GENERATED_ACTIVITY_H_
+void *t1();
+void *t2();
+void *t3();
 
 #endif

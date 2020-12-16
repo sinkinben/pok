@@ -14,7 +14,6 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-
 #include <libc/stdio.h>
 #include <core/thread.h>
 #include <core/partition.h>
@@ -22,31 +21,29 @@
 #include <types.h>
 #include "activity.h"
 
-uint8_t sid;
-
-int main ()
+int main()
 {
   uint32_t tid;
   pok_ret_t ret;
-  pok_thread_attr_t     tattr;
+  pok_thread_attr_t attr;
 
-  ret = pok_sem_create(&sid , 0, 50, POK_SEMAPHORE_DISCIPLINE_FIFO);
-  printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
+  attr.priority = 42;
+  attr.entry = t1;
+  attr.period = 20;
+  attr.deadline = 100;
+  attr.time_capacity = 5;
+  ret = pok_thread_create(&tid, &attr);
 
-  tattr.priority = 42;
-  tattr.entry = pinger_job;
+  attr.deadline = 20;
+  attr.entry = t2;
+  ret = pok_thread_create(&tid, &attr);
 
-  ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (1) return=%d\n", ret);
+  attr.deadline = 60;
+  attr.entry = t3;
+  ret = pok_thread_create(&tid, &attr);
 
-  tattr.priority = 42;
-  tattr.entry = pinger_job2;
+  pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
+  pok_thread_wait_infinite();
 
-  ret = pok_thread_create(&tid , &tattr);
-  printf("[P1] pok_thread_create (2) return=%d\n", ret);
-
-  pok_partition_set_mode (POK_PARTITION_MODE_NORMAL);
-  pok_thread_wait_infinite ();
-
-   return (0);
+  return (0);
 }

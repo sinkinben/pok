@@ -512,10 +512,38 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
  **/
 uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
-   // TODO
-   printf("hello, edf\n");
-   return IDLE_THREAD;
-   return index_low + index_high + prev_thread + current_thread;
+   uint32_t res;
+   uint32_t from;
+   uint64_t deadline = (~0);
+
+   if (current_thread == IDLE_THREAD)
+   {
+      res = prev_thread;
+   }
+   else
+   {
+      res = current_thread;
+   }
+
+   from = res;
+
+   uint8_t i = 0;
+   for (i = index_low; i <= index_high; i++)
+   {
+      if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+          pok_threads[i].deadline < deadline &&
+          pok_threads[i].remaining_time_capacity > 0)
+      {
+         res = i;
+         deadline = pok_threads[i].deadline;
+      }
+   }
+
+   if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
+   {
+      res = IDLE_THREAD;
+   }
+   return res;
 }
 
 uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
