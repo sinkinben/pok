@@ -18,9 +18,10 @@
 #include <core/partition.h>
 #include <types.h>
 #include "activity.h"
-
+uint8_t N = 4;
 int main()
 {
+  printf("\nFP Testing in PR2: ");
   uint32_t tid;
   int ret;
   pok_thread_attr_t attr;

@@ -21,7 +21,7 @@
 
 int main()
 {
-  printf("In pr3: ");
+  printf("\nWRR Testing in PR3: ");
   uint32_t tid;
   int ret;
   pok_thread_attr_t attr;

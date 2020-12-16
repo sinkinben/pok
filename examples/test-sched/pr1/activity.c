@@ -18,21 +18,37 @@
 #include <core/thread.h>
 #include <core/semaphore.h>
 #include <types.h>
-
+static const uint64_t sleep_val = 500000;
+extern uint8_t N;
 void *t1()
 {
-   printf("Pr1: T1\n");
+   uint8_t i;
+   for (i = 0; i < N; i++)
+   {
+      printf("T1 ");
+      pok_thread_sleep(sleep_val);
+   }
    return NULL;
 }
 
 void *t2()
 {
-   printf("Pr1: T2\n");
+   uint8_t i;
+   for (i = 0; i < N; i++)
+   {
+      printf("T2 ");
+      pok_thread_sleep(sleep_val);
+   }
    return NULL;
 }
 
 void *t3()
 {
-   printf("Pr1: T3\n");
+   uint8_t i;
+   for (i = 0; i < N; i++)
+   {
+      printf("T3 ");
+      pok_thread_sleep(sleep_val);
+   }
    return NULL;
 }

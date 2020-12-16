@@ -20,18 +20,20 @@
 #include <core/semaphore.h>
 #include <types.h>
 #include "activity.h"
-
+uint8_t N = 4;
 int main()
 {
+  N = 4;
+  printf("\nEDF Testing in PR1: ");
   uint32_t tid;
   pok_ret_t ret;
   pok_thread_attr_t attr;
 
-  attr.priority = 42;
-  attr.entry = t1;
-  attr.period = 20;
+  // attr.priority = 42;
+  // attr.period = 20;
+  // attr.time_capacity = 5;
   attr.deadline = 100;
-  attr.time_capacity = 5;
+  attr.entry = t1;
   ret = pok_thread_create(&tid, &attr);
 
   attr.deadline = 20;
