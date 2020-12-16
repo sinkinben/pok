@@ -528,10 +528,40 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
 
 uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
-   // TODO
-   printf("hello, priority\n");
-   return IDLE_THREAD;
-   return index_low + index_high + prev_thread + current_thread;
+   const uint8_t max_priority = 0xff;
+
+   uint32_t res;
+   uint32_t from;
+   uint8_t priority = max_priority;
+
+   if (current_thread == IDLE_THREAD)
+   {
+      res = prev_thread;
+   }
+   else
+   {
+      res = current_thread;
+   }
+
+   from = res;
+
+   uint8_t i = 0;
+   for (i = index_low; i <= index_high; i++)
+   {
+      if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+          pok_threads[i].priority < priority &&
+          pok_threads[i].remaining_time_capacity > 0)
+      {
+         res = i;
+         priority = pok_threads[i].priority;
+      }
+   }
+
+   if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
+   {
+      res = IDLE_THREAD;
+   }
+   return res;
 }
 
 uint32_t pok_sched_part_mlfq(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
