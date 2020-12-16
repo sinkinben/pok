@@ -1,3 +1,4 @@
 ## 测试内核调度算法的正确性
-+ pr1: 测试 EDF
-+ pr2: 测试 FP 
++ pr1: EDF Testing
++ pr2: FP Testing
++ pr3: WRR Testing

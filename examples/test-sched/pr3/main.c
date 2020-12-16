@@ -14,25 +14,35 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-#include <libc/stdio.h>
 #include <core/thread.h>
-#include <core/semaphore.h>
+#include <core/partition.h>
 #include <types.h>
+#include "activity.h"
 
-void *t1()
+int main()
 {
-   printf("Pr1: T1\n");
-   return NULL;
-}
+  printf("In pr3: ");
+  uint32_t tid;
+  int ret;
+  pok_thread_attr_t attr;
 
-void *t2()
-{
-   printf("Pr1: T2\n");
-   return NULL;
-}
+  attr.entry = t1_job;
+  // attr.period = 20;
+  // attr.deadline = 1000;
+  // attr.time_capacity = 5;
+  attr.weight = 4;
+  ret = pok_thread_create(&tid, &attr);
 
-void *t3()
-{
-   printf("Pr1: T3\n");
-   return NULL;
+  attr.weight = 3;
+  attr.entry = t2_job;
+  ret = pok_thread_create(&tid, &attr);
+
+  attr.weight = 2;
+  attr.entry = t3_job;
+  ret = pok_thread_create(&tid, &attr);
+
+  pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
+  pok_thread_wait_infinite();
+
+  return (1);
 }

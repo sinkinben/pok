@@ -15,31 +15,12 @@
  */
 
 
-#include <libc/stdio.h>
-#include <core/thread.h>
-void* pinger_job ()
-{
-   while (1)
-   {
-      printf("P2T1: begin of task\n");
-      pok_thread_sleep (5000000);
-   }
-}
+#ifndef __POK_USER_GENERATED_ACTIVITY_H_
+#define __POK_USER_GENERATED_ACTIVITY_H_ 
+void* pinger_job ();
 
-void *t1_job()
-{
-   printf("Pr2: T1\n");
-   return NULL;
-}
+void *t1_job();
+void *t2_job();
+void *t3_job();
 
-void *t2_job()
-{
-   printf("Pr2: T2\n");
-   return NULL;
-}
-
-void *t3_job()
-{
-   printf("Pr2: T3\n");
-   return NULL;
-}
+#endif

@@ -79,6 +79,62 @@ uint32_t	         current_thread = KERNEL_THREAD;
 void pok_sched_thread_switch (void);
 
 /**
+ * \brief: some helper functions to implement scheduler algorithm
+ * \author: sinkinben
+ * \date: 2020/12/16 
+ **/
+static int gcd(int a, int b)
+{
+   // require a > b
+   if (a < b) 
+   {
+      int c = a;
+      a = b;
+      b = c;
+   }
+   return (b == 0) ? a : gcd(b, a % b);
+}
+
+static int get_threads_weight_max(const uint32_t low, const uint32_t high) 
+{
+   uint32_t i;
+   int max_weight = (1 << 31);
+   for (i = low; i < high; i++)
+   {
+      if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+          pok_threads[i].weight > max_weight)
+      {
+         max_weight = pok_threads[i].weight;
+      }
+   }
+   return max_weight;
+}
+
+static int get_threads_weight_gcd(const uint32_t low, const uint32_t high)
+{
+   uint32_t i = 0;
+   int gcd_weight = 0;
+   for (i = low; i < high; i++)
+   {
+      if (pok_threads[i].state == POK_STATE_RUNNABLE)
+      {
+         if (gcd_weight != 0)
+         {
+            gcd_weight = gcd(gcd_weight, pok_threads[i].weight);
+         }
+         else
+         {
+            gcd_weight = pok_threads[i].weight;
+         }
+      }
+   }
+   return gcd_weight;
+}
+
+// helper functions end here
+
+
+/**
  *\\brief Init scheduling service
  */
 
@@ -548,10 +604,85 @@ uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high,
 
 uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
-   // TODO
-   printf("hello, wrr\n");
-   return IDLE_THREAD;
-   return index_low + index_high + prev_thread + current_thread;
+   uint32_t res;
+   uint32_t from;
+
+   if (current_thread == IDLE_THREAD)
+   {
+      res = prev_thread;
+   }
+   else
+   {
+      res = current_thread;
+   }
+
+   from = res;
+
+   // TODO: implement WRR algorithm
+   int weight_gcd = get_threads_weight_gcd(index_low, index_high);
+   int weight_max = get_threads_weight_max(index_low, index_high);
+   // const uint32_t n = index_high - index_low + 1;
+   uint32_t i = index_low - 1;
+   int cw = 0;
+   if (pok_partitions[pok_current_partition].prev_thread != IDLE_THREAD)
+   {
+      i = pok_partitions[pok_current_partition].prev_thread;
+   }
+
+   if (pok_partitions[pok_current_partition].current_weight != 0)
+   {
+      cw = pok_partitions[pok_current_partition].current_weight;
+   }
+
+   /* --------------- split line  --------------- */
+   if (weight_max <= 0)
+      return IDLE_THREAD;
+   // for (i = index_low; i <= index_high; i++)
+   // {
+   //    printf("%d ", pok_threads[i].weight);
+   // }
+   // printf("\n");
+   for (i = index_low; i <= index_high; i++)
+   {
+      if (pok_threads[i].weight > 0 && pok_threads[i].weight == weight_max)
+      {
+         pok_threads[i].weight--;
+         return i;
+      }
+   }
+   /* --------------- split line  --------------- */
+
+   while (1)
+   {
+      i = i + 1;
+      if (i == index_high + 1)
+         i = index_low;
+      if (i == index_low)
+      {
+         // 在每个分区的数据结构 pok_partition_t 中记录当前的 cw
+         pok_partitions[pok_current_partition].current_weight = cw = cw - weight_gcd;
+         if (cw <= 0)
+         {
+            pok_partitions[pok_current_partition].current_weight = cw = weight_max;
+            if (cw == 0)
+            {
+               res = IDLE_THREAD;
+               break;
+            }
+         }
+      }
+      if (pok_threads[i].weight >= cw)
+      {
+         res = i;
+         break;
+      }
+   }
+
+   if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
+   {
+      res = IDLE_THREAD;
+   }
+   return res;
 }
 
 uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)

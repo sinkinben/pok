@@ -14,32 +14,35 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-
 #include <libc/stdio.h>
 #include <core/thread.h>
-void* pinger_job ()
+const uint64_t sleep_val = 50000;
+void *t1_job()
 {
    while (1)
    {
-      printf("P2T1: begin of task\n");
-      pok_thread_sleep (5000000);
+      printf("A ");
+      pok_thread_sleep(sleep_val);
    }
-}
-
-void *t1_job()
-{
-   printf("Pr2: T1\n");
    return NULL;
 }
 
 void *t2_job()
 {
-   printf("Pr2: T2\n");
+   while (1)
+   {
+      printf("B ");
+      pok_thread_sleep(sleep_val);
+   }
    return NULL;
 }
 
 void *t3_job()
 {
-   printf("Pr2: T3\n");
+   while (1)
+   {
+      printf("C ");
+      pok_thread_sleep(sleep_val);
+   }
    return NULL;
 }
