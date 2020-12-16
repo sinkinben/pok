@@ -24,8 +24,10 @@
 extern uint8_t apple, orange, empty, mutex;
 extern plate_t plate;
 static const char *strs[] = {"apple", "orange"};
+static pok_time_t start, end;
 void *father_job()
 {
+   pok_time_get(&start);
    int i;
    for (i = 0; i < N; i++)
    {
@@ -79,6 +81,8 @@ void *daughter_job()
       pok_sem_signal(mutex);
       pok_sem_signal(empty);
    }
+   pok_time_get(&end);
+   printf("[PR2] time = %u\n", end - start);
    return NULL;
 }
 
