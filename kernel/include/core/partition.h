@@ -118,8 +118,9 @@ typedef struct
   uint32_t		lock_level;
   pok_start_condition_t	start_condition;
 
-  // added by sinkinben at 2020/12/15
-  int current_weight;  // added for support WRR algorithm, should be 0 at initialization phase
+  // added by sinkinben at 2020/12/16
+  int current_weight;    // added for supporting WRR thread schduler, should be 0 at initialization phase
+  uint8_t weight;        // weight for WRR partition scheduler
 } pok_partition_t;
 
 extern pok_partition_t pok_partitions[POK_CONFIG_NB_PARTITIONS];

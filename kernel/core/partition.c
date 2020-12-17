@@ -207,6 +207,13 @@ pok_ret_t pok_partition_init ()
       }
 #endif
 
+/*--------- split line --------*/
+// added by sinkinben at 2020/12/17
+#ifdef POK_NEEDS_PARTITIONS_SCHEDULER
+      pok_partitions[i].weight = ((uint8_t[])POK_CONFIG_PARTITIONS_WEIGHT)[i];
+#endif
+/*--------- split line --------*/
+
 #ifdef POK_CONFIG_PARTITIONS_SCHEDULER
       pok_partitions[i].sched             = ((pok_sched_t[]) POK_CONFIG_PARTITIONS_SCHEDULER) [i];
 #endif

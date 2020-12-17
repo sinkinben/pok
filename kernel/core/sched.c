@@ -131,6 +131,59 @@ static int get_threads_weight_gcd(const uint32_t low, const uint32_t high)
    return gcd_weight;
 }
 
+#ifdef POK_NEEDS_PARTITIONS_SCHEDULER
+static uint8_t get_next_partition()
+{
+   static uint8_t flag = 1;
+   uint8_t res = POK_SCHED_CURRENT_PARTITION;
+   uint8_t i = 0;
+   uint8_t type = (uint8_t)POK_CONFIG_PARTITIONS_TYPE;
+   int partitions_max_weight = pok_partitions[0].weight;
+   for (i = 0; i < POK_CONFIG_SCHEDULING_NBSLOTS; i++)
+   {
+      if (pok_partitions[i].weight > partitions_max_weight)
+         partitions_max_weight = pok_partitions[i].weight;
+   }
+   
+   // 如果 max_weight 为 0, 说明所有权重都用完了，说明 WRR 结束，所有分区机会均等
+   // 按照 SLOT 定义的序列依次执行
+   if (partitions_max_weight == 0)
+   {
+      type = POK_SCHED_RR;
+      if (flag)
+      {
+         flag--;
+         printf("Partitions scheduler WRR finish, now use RR\n");
+      }
+   }
+
+   switch (type)
+   {
+      case POK_SCHED_WRR:
+         for (i = 0; i < POK_CONFIG_SCHEDULING_NBSLOTS; i++)
+         {
+            if (pok_partitions[i].weight > 0 &&
+                pok_partitions[i].weight == partitions_max_weight)
+            {
+               pok_partitions[i].weight--;
+               pok_sched_current_slot = res = i;
+               break;
+            }
+         }
+         pok_sched_next_deadline = pok_sched_next_deadline + pok_sched_slots[pok_sched_current_slot];
+         break;
+      
+      case POK_SCHED_RR:
+      default:
+         // 顺序执行
+         pok_sched_current_slot = (pok_sched_current_slot + 1) % POK_CONFIG_SCHEDULING_NBSLOTS;
+         pok_sched_next_deadline = pok_sched_next_deadline + pok_sched_slots[pok_sched_current_slot];
+         res = pok_sched_slots_allocation[pok_sched_current_slot];
+         break;
+   }
+   return res;
+}
+#endif
 // helper functions end here
 
 
@@ -173,6 +226,12 @@ void pok_sched_init (void)
    pok_sched_next_deadline       = pok_sched_slots[0];
    pok_sched_next_flush          = 0;
    pok_current_partition         = pok_sched_slots_allocation[0];
+
+// added by sinkinben at 2020/12/17
+#ifdef POK_NEEDS_PARTITIONS_SCHEDULER
+   pok_current_partition         = get_next_partition();
+   printf("first executing partition = PR[%d]\n", pok_current_partition + 1);
+#endif
 }
 
 uint8_t pok_sched_get_priority_min (const pok_sched_t sched_type)
@@ -223,6 +282,7 @@ uint8_t	pok_elect_partition()
 #    endif /* defined POK_FLUSH_PERIOD || POK_NEEDS_FLUSH_ON_WINDOWS */
 #  endif /* defined (POK_NEEDS_PORTS....) */
 
+#ifndef POK_NEEDS_PARTITIONS_SCHEDULER
     pok_sched_current_slot = (pok_sched_current_slot + 1) % POK_CONFIG_SCHEDULING_NBSLOTS;
     pok_sched_next_deadline = pok_sched_next_deadline + pok_sched_slots[pok_sched_current_slot];
 /*
@@ -234,6 +294,10 @@ uint8_t	pok_elect_partition()
       printf ("new prev current thread = %d\n", pok_partitions[pok_sched_current_slot].prev_thread);
       */
     next_partition = pok_sched_slots_allocation[pok_sched_current_slot];
+#else
+    next_partition = get_next_partition();
+    printf("executing partition = PR[%d]\n", next_partition + 1);
+#endif
 
 #ifdef POK_NEEDS_SCHED_HFPPS
    if (pok_partitions[next_partition].payback > 0) // pay back!
