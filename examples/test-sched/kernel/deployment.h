@@ -28,32 +28,33 @@
 #define POK_NEEDS_CONSOLE      1
 #define POK_NEEDS_LOCKOBJECTS  1
 
-#define POK_CONFIG_NB_THREADS       14
+#define POK_CONFIG_NB_THREADS       18
 #define POK_CONFIG_NB_LOCKOBJECTS   0
-#define POK_CONFIG_NB_PARTITIONS    3
+#define POK_CONFIG_NB_PARTITIONS    4
 
-#define POK_CONFIG_PARTITIONS_SIZE  {120 * 1024, 120 * 1024, 120 * 1024};
-#define POK_CONFIG_PROGRAM_NAME  {"pr1/pr1.elf","pr2/pr2.elf", "pr3/pr3.elf"};
+#define POK_CONFIG_PARTITIONS_SIZE  {120 * 1024, 120 * 1024, 120 * 1024, 120 * 1024};
+#define POK_CONFIG_PROGRAM_NAME  {"pr1/pr1.elf","pr2/pr2.elf", "pr3/pr3.elf", "pr4/pr4.elf"};
 
 
-#define POK_CONFIG_SCHEDULING_SLOTS {2000000000, 2000000000, 2000000000}
-#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 6000000000
-#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0,1,2}
-#define POK_CONFIG_SCHEDULING_NBSLOTS 3
+#define POK_CONFIG_SCHEDULING_SLOTS {2000000000, 2000000000, 2000000000, 2000000000}
+#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 8000000000
+#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0,1,2,3}
+#define POK_CONFIG_SCHEDULING_NBSLOTS 4
 
 #define POK_NEEDS_THREAD_SUSPEND 1
 #define POK_NEEDS_THREAD_SLEEP 1
 
-#define POK_CONFIG_PARTITIONS_NTHREADS  {4,4,4}
-#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS  {0,0,0}
+#define POK_CONFIG_PARTITIONS_NTHREADS  {4,4,4,4}
+#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS  {0,0,0,0}
 
-#define POK_CONFIG_PARTITIONS_SCHEDULER {POK_SCHED_EDF, POK_SCHED_PRIORITY, POK_SCHED_WRR}
+#define POK_CONFIG_PARTITIONS_SCHEDULER {POK_SCHED_EDF, POK_SCHED_PRIORITY, POK_SCHED_WRR, POK_SCHED_WRR}
 
 typedef enum
 {
    pok_part_identifier_pr1 = 0,
    pok_part_identifier_pr2 = 1,
-   pok_part_identifier_pr3 = 2
+   pok_part_identifier_pr3 = 2,
+   pok_part_identifier_pr4 = 3
 } pok_part_identifiers_t;
 
 typedef enum
@@ -61,6 +62,7 @@ typedef enum
    pok_part_id_pr1 = 0,
    pok_part_id_pr2 = 1,
    pok_part_id_pr3 = 2,
+   pok_part_id_pr4 = 3
 }pok_part_id_t;
 
 typedef enum
