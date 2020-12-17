@@ -132,7 +132,7 @@ static int get_threads_weight_gcd(const uint32_t low, const uint32_t high)
 }
 
 #ifdef POK_NEEDS_PARTITIONS_SCHEDULER
-static uint8_t get_next_partition()
+static uint8_t wrr_select_partition()
 {
    static uint8_t flag = 1;
    uint8_t res = POK_SCHED_CURRENT_PARTITION;
@@ -229,7 +229,7 @@ void pok_sched_init (void)
 
 // added by sinkinben at 2020/12/17
 #ifdef POK_NEEDS_PARTITIONS_SCHEDULER
-   pok_current_partition         = get_next_partition();
+   pok_current_partition         = wrr_select_partition();
    printf("first executing partition = PR[%d]\n", pok_current_partition + 1);
 #endif
 }
@@ -295,7 +295,7 @@ uint8_t	pok_elect_partition()
       */
     next_partition = pok_sched_slots_allocation[pok_sched_current_slot];
 #else
-    next_partition = get_next_partition();
+    next_partition = wrr_select_partition();
     printf("executing partition = PR[%d]\n", next_partition + 1);
 #endif
 
