@@ -22,7 +22,7 @@
 #include <types.h>
 #include "activity.h"
 
-static const int N = 30;
+extern int N;
 static const int limit = 26;
 
 extern uint8_t empty1, full1, mutex1;

@@ -26,6 +26,8 @@ uint8_t empty1, full1, mutex1;
 uint8_t empty2, full2, mutex2;
 buffer_t buf1, buf2;
 
+int N = 35;
+
 int main()
 {
   // init buf
@@ -36,14 +38,20 @@ int main()
   pok_thread_attr_t tattr;
 
   tattr.priority = 42;
+  tattr.deadline = 1000;
+  tattr.weight = N;
   tattr.entry = producer_job;
   ret = pok_thread_create(&tid, &tattr);
 
-  tattr.priority = 42;
+  tattr.priority = 43;
+  tattr.deadline = 2000;
+  tattr.weight = N;
   tattr.entry = calculator_job(&tid, &tattr);
   ret = pok_thread_create(&tid, &tattr);
 
-  tattr.priority = 42;
+  tattr.priority = 44;
+  tattr.deadline = 3000;
+  tattr.weight = N;
   tattr.entry = consumer_job;
   ret = pok_thread_create(&tid, &tattr);
 
