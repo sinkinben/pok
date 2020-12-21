@@ -79,115 +79,6 @@ uint32_t	         current_thread = KERNEL_THREAD;
 void pok_sched_thread_switch (void);
 
 /**
- * \brief: some helper functions to implement scheduler algorithm
- * \author: sinkinben
- * \date: 2020/12/16 
- **/
-static int gcd(int a, int b)
-{
-   // require a > b
-   if (a < b) 
-   {
-      int c = a;
-      a = b;
-      b = c;
-   }
-   return (b == 0) ? a : gcd(b, a % b);
-}
-
-static int get_threads_weight_max(const uint32_t low, const uint32_t high) 
-{
-   uint32_t i;
-   int max_weight = (1 << 31);
-   for (i = low; i < high; i++)
-   {
-      if (pok_threads[i].state == POK_STATE_RUNNABLE &&
-          pok_threads[i].weight > max_weight)
-      {
-         max_weight = pok_threads[i].weight;
-      }
-   }
-   return max_weight;
-}
-
-static int get_threads_weight_gcd(const uint32_t low, const uint32_t high)
-{
-   uint32_t i = 0;
-   int gcd_weight = 0;
-   for (i = low; i < high; i++)
-   {
-      if (pok_threads[i].state == POK_STATE_RUNNABLE)
-      {
-         if (gcd_weight != 0)
-         {
-            gcd_weight = gcd(gcd_weight, pok_threads[i].weight);
-         }
-         else
-         {
-            gcd_weight = pok_threads[i].weight;
-         }
-      }
-   }
-   return gcd_weight;
-}
-
-#ifdef POK_NEEDS_PARTITIONS_SCHEDULER
-static uint8_t wrr_select_partition()
-{
-   static uint8_t flag = 1;
-   uint8_t res = POK_SCHED_CURRENT_PARTITION;
-   uint8_t i = 0;
-   uint8_t type = (uint8_t)POK_CONFIG_PARTITIONS_TYPE;
-   int partitions_max_weight = pok_partitions[0].weight;
-   for (i = 0; i < POK_CONFIG_SCHEDULING_NBSLOTS; i++)
-   {
-      if (pok_partitions[i].weight > partitions_max_weight)
-         partitions_max_weight = pok_partitions[i].weight;
-   }
-   
-   // 如果 max_weight 为 0, 说明所有权重都用完了，说明 WRR 结束，所有分区机会均等
-   // 按照 SLOT 定义的序列依次执行
-   if (partitions_max_weight == 0)
-   {
-      type = POK_SCHED_RR;
-      if (flag)
-      {
-         flag--;
-         printf("Partitions scheduler WRR finish, now use RR\n");
-      }
-   }
-
-   switch (type)
-   {
-      case POK_SCHED_WRR:
-         for (i = 0; i < POK_CONFIG_SCHEDULING_NBSLOTS; i++)
-         {
-            if (pok_partitions[i].weight > 0 &&
-                pok_partitions[i].weight == partitions_max_weight)
-            {
-               pok_partitions[i].weight--;
-               pok_sched_current_slot = res = i;
-               break;
-            }
-         }
-         pok_sched_next_deadline = pok_sched_next_deadline + pok_sched_slots[pok_sched_current_slot];
-         break;
-      
-      case POK_SCHED_RR:
-      default:
-         // 顺序执行
-         pok_sched_current_slot = (pok_sched_current_slot + 1) % POK_CONFIG_SCHEDULING_NBSLOTS;
-         pok_sched_next_deadline = pok_sched_next_deadline + pok_sched_slots[pok_sched_current_slot];
-         res = pok_sched_slots_allocation[pok_sched_current_slot];
-         break;
-   }
-   return res;
-}
-#endif
-// helper functions end here
-
-
-/**
  *\\brief Init scheduling service
  */
 
@@ -226,12 +117,6 @@ void pok_sched_init (void)
    pok_sched_next_deadline       = pok_sched_slots[0];
    pok_sched_next_flush          = 0;
    pok_current_partition         = pok_sched_slots_allocation[0];
-
-// added by sinkinben at 2020/12/17
-#ifdef POK_NEEDS_PARTITIONS_SCHEDULER
-   pok_current_partition         = wrr_select_partition();
-   printf("first executing partition = PR[%d]\n", pok_current_partition + 1);
-#endif
 }
 
 uint8_t pok_sched_get_priority_min (const pok_sched_t sched_type)
@@ -282,7 +167,6 @@ uint8_t	pok_elect_partition()
 #    endif /* defined POK_FLUSH_PERIOD || POK_NEEDS_FLUSH_ON_WINDOWS */
 #  endif /* defined (POK_NEEDS_PORTS....) */
 
-#ifndef POK_NEEDS_PARTITIONS_SCHEDULER
     pok_sched_current_slot = (pok_sched_current_slot + 1) % POK_CONFIG_SCHEDULING_NBSLOTS;
     pok_sched_next_deadline = pok_sched_next_deadline + pok_sched_slots[pok_sched_current_slot];
 /*
@@ -294,10 +178,6 @@ uint8_t	pok_elect_partition()
       printf ("new prev current thread = %d\n", pok_partitions[pok_sched_current_slot].prev_thread);
       */
     next_partition = pok_sched_slots_allocation[pok_sched_current_slot];
-#else
-    next_partition = wrr_select_partition();
-    printf("executing partition = PR[%d]\n", next_partition + 1);
-#endif
 
 #ifdef POK_NEEDS_SCHED_HFPPS
    if (pok_partitions[next_partition].payback > 0) // pay back!
@@ -632,10 +512,12 @@ uint32_t pok_sched_part_rr (const uint32_t index_low, const uint32_t index_high,
  **/
 uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
+   // TODO
    uint32_t res;
    uint32_t from;
-   uint64_t deadline = (~0);
-
+   // IDLE_THREAD 被宏定义为 (POK_CONFIG_NB_THREADS-1)
+   // IDLE_THREAD 应该是表示分区中的一个无意义的, 起占位作用的线程
+   // 分区中的线程数总是等于 main 函数创建的线程数 + 1 (参考 example 程序中的 kernel/deployment.h)
    if (current_thread == IDLE_THREAD)
    {
       res = prev_thread;
@@ -646,31 +528,79 @@ uint32_t pok_sched_part_edf(const uint32_t index_low, const uint32_t index_high,
    }
 
    from = res;
-
-   uint8_t i = 0;
-   for (i = index_low; i <= index_high; i++)
+   
+   uint32_t pivot;
+   pivot = from;
+   // res 从 current_thread 开始, 在 [index_low, index_high] 中查找
+   while (pivot != from)
    {
-      if (pok_threads[i].state == POK_STATE_RUNNABLE &&
-          pok_threads[i].deadline < deadline &&
-          pok_threads[i].remaining_time_capacity > 0)
+      pivot++;
+      if (pivot > index_high)
       {
-         res = i;
-         deadline = pok_threads[i].deadline;
+         pivot = index_low;
+      }
+      if ((pok_threads[pivot].state == POK_STATE_RUNNABLE) && (pok_threads[pivot].remaining_time_capacity > 0)  && (pok_threads[pivot].deadline < pok_threads[res].deadline))
+      {
+         res = pivot;
       }
    }
 
+   // 最终选择的线程 res 跟原来的线程 from 相同, 切换到 IDLE_THREAD
    if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
    {
       res = IDLE_THREAD;
    }
    return res;
+}
+
+uint32_t gcd(const uint32_t index_low, const uint32_t index_high)
+{
+   n = index_high - index_low;
+   uint32_t a[n] = {0};
+   for (uint32_t i = 0; i < n; i++){
+      a[i] = pok_threads[i].time_capacity;
+   }
+   int Min=a[0],pos=0,conter=0;
+   while(conter<n-1){
+      for(int i=0;i<n;i++){
+         if(a[i] && a[i]<Min){
+            Min=a[i];
+            pos=i;
+         }
+      }
+      
+      for(int i=0;i<n;i++){
+         if(i==pos) continue;
+         a[i]=a[i]%Min;
+         if(!a[i]) conter++; 
+      }
+   }
+   
+   for(int i=0;i<n;i++)
+      if(a[i]) return i; 
+
+}
+
+uint32_t max(const uint32_t index_low, const uint32_t index_high)
+{
+   n = index_high - index_low;
+   uint32_t a[n] = {0};
+   uint32_t max = 0;
+   for (uint32_t i = 0; i < n; i++){
+      a[i] = pok_threads[i].time_capacity;
+      if (a[i] > max)
+      {
+         max = a[i];
+      }
+   }
+   return max;
 }
 
 uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
+   // TODO
    uint32_t res;
    uint32_t from;
-
    if (current_thread == IDLE_THREAD)
    {
       res = prev_thread;
@@ -682,81 +612,45 @@ uint32_t pok_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
 
    from = res;
 
-   // TODO: implement WRR algorithm
-   int weight_gcd = get_threads_weight_gcd(index_low, index_high);
-   int weight_max = get_threads_weight_max(index_low, index_high);
-   // const uint32_t n = index_high - index_low + 1;
-   uint32_t i = index_low - 1;
-   int cw = 0;
-   if (pok_partitions[pok_current_partition].prev_thread != IDLE_THREAD)
+   // res 从 current_thread 开始, 在 [index_low, index_high] 中查找
+   uint32_t cw = 0;
+   while(1)
    {
-      i = pok_partitions[pok_current_partition].prev_thread;
-   }
-
-   if (pok_partitions[pok_current_partition].current_weight != 0)
-   {
-      cw = pok_partitions[pok_current_partition].current_weight;
-   }
-
-   /* --------------- split line  --------------- */
-   if (weight_max <= 0)
-      return IDLE_THREAD;
-   // for (i = index_low; i <= index_high; i++)
-   // {
-   //    printf("%d ", pok_threads[i].weight);
-   // }
-   // printf("\n");
-   for (i = index_low; i <= index_high; i++)
-   {
-      if (pok_threads[i].weight > 0 && pok_threads[i].weight == weight_max)
+      res++;
+      if (res > index_high)
       {
-         pok_threads[i].weight--;
-         return i;
+         res = index_low;
       }
-   }
-   /* --------------- split line  --------------- */
-
-   while (1)
-   {
-      i = i + 1;
-      if (i == index_high + 1)
-         i = index_low;
-      if (i == index_low)
+      if (res == index_low)
       {
-         // 在每个分区的数据结构 pok_partition_t 中记录当前的 cw
-         pok_partitions[pok_current_partition].current_weight = cw = cw - weight_gcd;
+         cw = cw - gcd(index_low, index_high);
          if (cw <= 0)
          {
-            pok_partitions[pok_current_partition].current_weight = cw = weight_max;
+            cw = max(index_low, index_high);
             if (cw == 0)
             {
-               res = IDLE_THREAD;
-               break;
+               return IDLE_THREAD;
             }
          }
       }
-      if (pok_threads[i].weight >= cw)
+      if ((pok_threads[res].state == POK_STATE_RUNNABLE) && (pok_threads[res].remaining_time_capacity > cw))
       {
-         res = i;
-         break;
+         return res;
       }
    }
-
+   // 最终选择的线程 res 跟原来的线程 from 相同, 切换到 IDLE_THREAD
    if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
    {
       res = IDLE_THREAD;
+      return res;
    }
-   return res;
 }
 
 uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread, const uint32_t current_thread)
 {
-   const uint8_t max_priority = 0xff;
-
+   // TODO
    uint32_t res;
    uint32_t from;
-   uint8_t priority = max_priority;
-
    if (current_thread == IDLE_THREAD)
    {
       res = prev_thread;
@@ -767,19 +661,24 @@ uint32_t pok_sched_part_priority(const uint32_t index_low, const uint32_t index_
    }
 
    from = res;
-
-   uint8_t i = 0;
-   for (i = index_low; i <= index_high; i++)
+   
+   uint32_t pivot;
+   pivot = from;
+   // res 从 current_thread 开始, 在 [index_low, index_high] 中查找
+   while (pivot != from)
    {
-      if (pok_threads[i].state == POK_STATE_RUNNABLE &&
-          pok_threads[i].priority < priority &&
-          pok_threads[i].remaining_time_capacity > 0)
+      pivot++;
+      if (pivot > index_high)
       {
-         res = i;
-         priority = pok_threads[i].priority;
+         pivot = index_low;
+      }
+      if ((pok_threads[pivot].state == POK_STATE_RUNNABLE) && (pok_threads[pivot].remaining_time_capacity > 0)  && (pok_threads[pivot].priority < pok_threads[res].deadline))
+      {
+         res = pivot;
       }
    }
 
+   // 最终选择的线程 res 跟原来的线程 from 相同, 切换到 IDLE_THREAD
    if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE))
    {
       res = IDLE_THREAD;
